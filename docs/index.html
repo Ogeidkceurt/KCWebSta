@@ -34,7 +34,13 @@
     th {
       background-color: #4CAF50;
       color: white;
+      cursor: pointer;              /* Zeig, dass es klickbar ist */
+      user-select: none;
     }
+
+    /* Sort-Pfeile */
+    th.th-sort-asc::after  { content: " ▲"; }
+    th.th-sort-desc::after { content: " ▼"; }
 
     /* Zebra-Effekt */
     tr:nth-child(even) {
@@ -64,27 +70,79 @@
   <!-- PapaParse fürs CSV-Parsing -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    Papa.parse('data/player_stats.csv', {
-      download: true,
-      header: true,
-      complete: function(results) {
-        // Leere Zeilen (z.B. durch Trailing Newline) herausfiltern
-        const rows = results.data.filter(row => row.Pilot && row.Pilot.trim() !== "");
-        const tbody = document.querySelector('#stats-table tbody');
-        rows.forEach(row => {
-          const tr = document.createElement('tr');
-          ['Pilot','FlightTime_h','AA_Kills','AG_Kills'].forEach(col => {
-            const td = document.createElement('td');
-            td.textContent = row[col];
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        });
-      },
-      error: function(err) {
-        console.error('CSV-Fehler:', err);
+    // Funktion, um eine Tabelle nach Spalte zu sortieren
+    function sortTableByColumn(table, columnIndex, asc = true) {
+      const dirModifier = asc ? 1 : -1;
+      const tBody = table.tBodies[0];
+      const rows = Array.from(tBody.querySelectorAll("tr"));
+
+      // Sortieren
+      const sortedRows = rows.sort((a, b) => {
+        let aText = a.cells[columnIndex].textContent.trim();
+        let bText = b.cells[columnIndex].textContent.trim();
+
+        // Zahlenerkennung (Punkt oder Komma)
+        const aNum = parseFloat(aText.replace(",", "."));
+        const bNum = parseFloat(bText.replace(",", "."));
+
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return (aNum - bNum) * dirModifier;
+        } else {
+          return aText.localeCompare(bText) * dirModifier;
+        }
+      });
+
+      // Alte Zeilen entfernen
+      while (tBody.firstChild) {
+        tBody.removeChild(tBody.firstChild);
       }
+      // Neue (sortierte) Zeilen einfügen
+      tBody.append(...sortedRows);
+
+      // Sort-Indikatoren im Header aktualisieren
+      table.querySelectorAll("th").forEach(th => th.classList.remove("th-sort-asc", "th-sort-desc"));
+      table.querySelector(`th:nth-child(${columnIndex + 1})`)
+           .classList.toggle("th-sort-asc", asc);
+      table.querySelector(`th:nth-child(${columnIndex + 1})`)
+           .classList.toggle("th-sort-desc", !asc);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Papa.parse('data/player_stats.csv', {
+        download: true,
+        header: true,
+        complete: function(results) {
+          // Leere Zeilen herausfiltern
+          const rows = results.data.filter(r => r.Pilot && r.Pilot.trim() !== "");
+          const tbody = document.querySelector('#stats-table tbody');
+
+          // Tabelle mit Daten füllen
+          rows.forEach(row => {
+            const tr = document.createElement('tr');
+            ['Pilot','FlightTime_h','AA_Kills','AG_Kills'].forEach(col => {
+              const td = document.createElement('td');
+              td.textContent = row[col];
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+
+          // Sortier-Handler pro Header
+          const table = document.getElementById('stats-table');
+          table.querySelectorAll('th').forEach((th, idx) => {
+            let asc = true;
+            th.addEventListener('click', () => {
+              sortTableByColumn(table, idx, asc);
+              asc = !asc;
+            });
+          });
+        },
+        error: function(err) {
+          console.error('CSV-Fehler:', err);
+        }
+      });
     });
   </script>
 </body>
 </html>
+
