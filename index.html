@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>DCS-Stats</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>DCS World Server – Player Stats</h1>
+  <table id="stats-table">
+    <thead>
+      <tr>
+        <th>Pilot</th>
+        <th>Flugzeit (h)</th>
+        <th>A/A-Kills</th>
+        <th>A/G-Kills</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- PapaParse fürs CSV-Parsing von CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    Papa.parse('data/player_stats.csv', {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const tbody = document.querySelector('#stats-table tbody');
+        results.data.forEach(row => {
+          const tr = document.createElement('tr');
+          ['Pilot','FlightTime_h','AA_Kills','AG_Kills'].forEach(col => {
+            const td = document.createElement('td');
+            td.textContent = row[col];
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
