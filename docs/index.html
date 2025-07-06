@@ -56,14 +56,16 @@
 <body>
   <h1>DCS Kingchanger - Flugstatistiken</h1>
   <table id="stats-table">
-    <thead>
-      <tr>
-        <th>Pilot/in</th>
-        <th>Flugzeit (h)</th>
-        <th>A/A-Kills</th>
-        <th>A/G-Kills</th>
-      </tr>
-    </thead>
+<thead>
+  <tr>
+    <th>Pilot/in</th>
+    <th>Flugzeit (h)</th>
+    <th>A/A-Kills</th>
+    <th>A/G-Kills</th>
+    <th>Tode</th>
+    <th>K/D</th>
+  </tr>
+</thead>
     <tbody></tbody>
   </table>
 
@@ -119,7 +121,7 @@
           // Tabelle mit Daten füllen
           rows.forEach(row => {
             const tr = document.createElement('tr');
-            ['Pilot','FlightTime_h','AA_Kills','AG_Kills'].forEach(col => {
+            ['Pilot','FlightTime_h','AA_Kills','AG_Kills','Deaths','K/D'].forEach(col => {
               const td = document.createElement('td');
               td.textContent = row[col];
               tr.appendChild(td);
