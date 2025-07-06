@@ -34,7 +34,7 @@
     th {
       background-color: #4CAF50;
       color: white;
-      cursor: pointer;              /* Zeig, dass es klickbar ist */
+      cursor: pointer;
       user-select: none;
     }
 
@@ -56,34 +56,32 @@
 <body>
   <h1>DCS Kingchanger - Flugstatistiken</h1>
   <table id="stats-table">
-<thead>
-  <tr>
-    <th>Pilot/in</th>
-    <th>Flugzeit (h)</th>
-    <th>A/A-Kills</th>
-    <th>A/G-Kills</th>
-    <th>Tode</th>
-    <th>K/D</th>
-  </tr>
-</thead>
+    <thead>
+      <tr>
+        <th>Pilot/in</th>
+        <th>Flugzeit (h)</th>
+        <th>A/A-Kills</th>
+        <th>A/G-Kills</th>
+        <th>Tode</th>
+        <th>K/D</th>
+      </tr>
+    </thead>
     <tbody></tbody>
   </table>
 
   <!-- PapaParse fürs CSV-Parsing -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    // Funktion, um eine Tabelle nach Spalte zu sortieren
+    // Sortierfunktion
     function sortTableByColumn(table, columnIndex, asc = true) {
       const dirModifier = asc ? 1 : -1;
       const tBody = table.tBodies[0];
       const rows = Array.from(tBody.querySelectorAll("tr"));
 
-      // Sortieren
       const sortedRows = rows.sort((a, b) => {
         let aText = a.cells[columnIndex].textContent.trim();
         let bText = b.cells[columnIndex].textContent.trim();
 
-        // Zahlenerkennung (Punkt oder Komma)
         const aNum = parseFloat(aText.replace(",", "."));
         const bNum = parseFloat(bText.replace(",", "."));
 
@@ -98,53 +96,51 @@
       while (tBody.firstChild) {
         tBody.removeChild(tBody.firstChild);
       }
-      // Neue (sortierte) Zeilen einfügen
+      // Neue Zeilen einfügen
       tBody.append(...sortedRows);
 
-      // Sort-Indikatoren im Header aktualisieren
+      // Sort-Indikatoren aktualisieren
       table.querySelectorAll("th").forEach(th => th.classList.remove("th-sort-asc", "th-sort-desc"));
-      table.querySelector(`th:nth-child(${columnIndex + 1})`)
-           .classList.toggle("th-sort-asc", asc);
-      table.querySelector(`th:nth-child(${columnIndex + 1})`)
-           .classList.toggle("th-sort-desc", !asc);
+      const header = table.querySelector(`th:nth-child(${columnIndex + 1})`);
+      header.classList.toggle("th-sort-asc", asc);
+      header.classList.toggle("th-sort-desc", !asc);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      Papa.parse('data/player_stats.csv', {
+    document.addEventListener("DOMContentLoaded", function() {
+      Papa.parse("data/player_stats.csv", {
         download: true,
         header: true,
         complete: function(results) {
           // Leere Zeilen herausfiltern
-          const rows = results.data.filter(r => r.Pilot && r.Pilot.trim() !== "");
-          const tbody = document.querySelector('#stats-table tbody');
+          const rows = results.data.filter(row => row.Pilot && row.Pilot.trim() !== "");
+          const tbody = document.querySelector("#stats-table tbody");
 
           // Tabelle mit Daten füllen
           rows.forEach(row => {
-            const tr = document.createElement('tr');
-            ['Pilot','FlightTime_h','AA_Kills','AG_Kills','Deaths','K/D'].forEach(col => {
-              const td = document.createElement('td');
+            const tr = document.createElement("tr");
+            ["Pilot","FlightTime_h","AA_Kills","AG_Kills","Deaths","K/D"].forEach(col => {
+              const td = document.createElement("td");
               td.textContent = row[col];
               tr.appendChild(td);
             });
             tbody.appendChild(tr);
           });
 
-          // Sortier-Handler pro Header
-          const table = document.getElementById('stats-table');
-          table.querySelectorAll('th').forEach((th, idx) => {
+          // Event-Listener zum Sortieren
+          const table = document.getElementById("stats-table");
+          table.querySelectorAll("th").forEach((th, idx) => {
             let asc = true;
-            th.addEventListener('click', () => {
+            th.addEventListener("click", function() {
               sortTableByColumn(table, idx, asc);
               asc = !asc;
             });
           });
         },
         error: function(err) {
-          console.error('CSV-Fehler:', err);
+          console.error("CSV-Fehler:", err);
         }
       });
     });
   </script>
 </body>
 </html>
-
