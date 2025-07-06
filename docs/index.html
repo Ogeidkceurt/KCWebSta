@@ -4,9 +4,47 @@
   <meta charset="utf-8">
   <title>DCS-Stats</title>
   <style>
-    table { border-collapse: collapse; width: 100%; }
-    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; }
-    th { background: #f0f0f0; }
+    /* Grundschrift */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fafafa;
+      margin: 20px;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    /* Tabelle */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    /* Header-Farbe */
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    /* Zebra-Effekt */
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    /* Hover-Effekt */
+    tr:hover {
+      background-color: #ddd;
+    }
   </style>
 </head>
 <body>
@@ -23,7 +61,7 @@
     <tbody></tbody>
   </table>
 
-  <!-- PapaParse fürs CSV-Parsing von CDN -->
+  <!-- PapaParse fürs CSV-Parsing -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     Papa.parse('data/player_stats.csv', {
@@ -40,6 +78,9 @@
           });
           tbody.appendChild(tr);
         });
+      },
+      error: function(err) {
+        console.error('CSV-Fehler:', err);
       }
     });
   </script>
