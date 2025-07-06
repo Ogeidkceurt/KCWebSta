@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>DCS-Stats</title>
+  <title>DCS Kingchanger - Flugstatistiken</title>
   <style>
     /* Grundschrift */
     body {
@@ -48,7 +48,7 @@
   </style>
 </head>
 <body>
-  <h1>DCS World Server – Player Stats</h1>
+  <h1>DCS Kingchanger - Flugstatistiken</h1>
   <table id="stats-table">
     <thead>
       <tr>
@@ -68,8 +68,10 @@
       download: true,
       header: true,
       complete: function(results) {
+        // Leere Zeilen (z.B. durch Trailing Newline) herausfiltern
+        const rows = results.data.filter(row => row.Pilot && row.Pilot.trim() !== "");
         const tbody = document.querySelector('#stats-table tbody');
-        results.data.forEach(row => {
+        rows.forEach(row => {
           const tr = document.createElement('tr');
           ['Pilot','FlightTime_h','AA_Kills','AG_Kills'].forEach(col => {
             const td = document.createElement('td');
